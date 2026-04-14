@@ -326,6 +326,15 @@ namespace VContainer.Unity
                 return implParent;
             }
 
+            // Check for overrides before reverting to the settings in the scene
+            lock (SyncRoot)
+            {
+                if (GlobalOverrideParents.Count > 0)
+                {
+                    return GlobalOverrideParents.Peek();
+                }
+            }
+
             // Find in scene via type
             if (parentReference.Type != null && parentReference.Type != GetType())
             {
@@ -337,14 +346,6 @@ namespace VContainer.Unity
                 throw new VContainerParentTypeReferenceNotFound(
                     parentReference.Type,
                     $"{name} could not found parent reference of type : {parentReference.Type}");
-            }
-
-            lock (SyncRoot)
-            {
-                if (GlobalOverrideParents.Count > 0)
-                {
-                    return GlobalOverrideParents.Peek();
-                }
             }
 
             // Find root from settings
